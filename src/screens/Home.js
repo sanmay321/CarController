@@ -7,6 +7,7 @@ import {
   // TouchableOpacity,
   Modal,
   ImageBackground,
+  Pressable,
 } from 'react-native';
 import {  TouchableOpacity} from 'react-native-gesture-handler'
 import {hp, wp} from '../helpers/Responsiveness';
@@ -19,8 +20,8 @@ import CustomSlider from '../components/Slider';
 import {globalPath} from '../constants/globalPath';
 import Icon from '../components/Icon';
 import RightIcons from '../components/RightIcons';
-import App from '../screens/Streamer';
 import WebSocketExample from './wifi';
+import Streamer from '../screens/Streamer';
 
 const Home = () => {
   const [sliderValue, setSliderValue] = useState(0);
@@ -122,12 +123,14 @@ const Home = () => {
         }}>
         <View style={styles.screenContainer}>
           {/* <Image source={globalPath.image1} style={styles.screenImage} /> */}
-          <App/>
+          <Streamer/>
+          <View style={styles.iconStyle}>
           <TouchableOpacity
             onPress={() => setFullScreen(true)}
-            style={styles.iconStyle}>
+            >
             <Icon size={wp(3)} source={globalPath.fullscreen} />
           </TouchableOpacity>
+          </View>
         </View>
 
         {/* Joy Sticks Container */}
@@ -140,7 +143,7 @@ const Home = () => {
             <CustomSlider Value={sliderValue}OnValueChange={handleValueChange}/>
           </View>
           <View style={{right: wp(-2)}}>
-            {/* <CustomAxisPad onTouchEvent={onTouchEvent}/> */}
+            <CustomAxisPad onTouchEvent={onTouchEvent}/>
             {/* <WebSocketExample/> */}
           </View>
         </View>
@@ -162,21 +165,22 @@ const Home = () => {
         transparent={true}
         visible={isFullScreen}
         onRequestClose={() => setFullScreen(false)}>
-        <ImageBackground
-          source={globalPath.image1} // Replace with your image URL or import a local image
+        <View
+          // source={globalPath.image1} // Replace with your image URL or import a local image
           style={styles.backgroundImage}>
+        <Streamer/>
+        <View style={styles.iconStyle}>
           <TouchableOpacity
-            onPress={() => setFullScreen(false)}
-            style={styles.iconStyle}>
+            onPress={() => setFullScreen(false)}>
             <Icon size={wp(3)} source={globalPath.fullscreen} />
           </TouchableOpacity>
+        </View>
           <View
             style={[
               styles.joystickContainer,
               {
                 width: wp(90),
-                alignSelf: 'center',
-                top: 0,
+                alignSelf: 'center', top: hp(50),position:'absolute'
               },
             ]}>
             <CustomAxisPad opacity={0.5} onTouchEvent={onTouchEvent}/>
@@ -187,7 +191,9 @@ const Home = () => {
               flexDirection: 'row',
               justifyContent: 'center',
               bottom: hp(10),
-              zIndex:1
+              zIndex:1,
+              position:'absolute',
+              alignSelf:'center'
             }}>
             <RightIcons
               source={globalPath.Rectangle}
@@ -218,7 +224,7 @@ const Home = () => {
               onPress={() => handleIconPress('circle')}
             />
           </View>
-        </ImageBackground>
+        </View>
       </Modal>
     </View>
   );

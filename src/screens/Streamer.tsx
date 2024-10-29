@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {VLCPlayer} from 'react-native-vlc-media-player';
 import {View, StyleSheet, Text} from 'react-native';
 import {  TouchableOpacity} from 'react-native-gesture-handler'
+import ResponsiveText from '../components/RnText';
+import { colors } from '../constants/colorsPallet';
 
-const App = () => {
+const Streamer = () => {
   const [error, setError] = useState(false);
   const [reload, setReload] = useState(false)
-  const rtspServerUrl = 'rtsp://192.168.0.102:8554/stream'
+  const rtspServerUrl = 'rtsp://192.168.0.106:8554/stream'
 
 
   const handleError = (e: any,s : any) => {
@@ -34,7 +36,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       {error && <Text style={styles.errorText}>Not Connected / No Video</Text>}
-      <TouchableOpacity onPress={()=>reloadComponent()}><Text>HI</Text></TouchableOpacity>
+      {/* <TouchableOpacity onPress={()=>reloadComponent()}><ResponsiveText color={colors.white}>HI</ResponsiveText></TouchableOpacity> */}
         {!reload && <VLCPlayer
   source={{
     uri: rtspServerUrl,
@@ -50,7 +52,7 @@ const App = () => {
   }}
   style={styles.video}
   autoAspectRatio={true}
-  resizeMode="contain"
+  // resizeMode="contain"
   onError={(e) => handleError(e, "onError")}
   onStopped={(e) => handleError(e, "onStopped")}
   onPaused={(e) => handleError(e, "onPaused")}
@@ -68,10 +70,12 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
+    width:'100%',
+    height:"100%"
   },
   video: {
     width: '100%',
@@ -84,7 +88,7 @@ textAlign: 'center',
 },
 });
 
-export default App;
+export default Streamer;
 
 
 
