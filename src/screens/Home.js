@@ -1,5 +1,5 @@
 
-import React, {useState} from 'react';
+import React, {useState,useRef,useEffect} from 'react';
 import {
   View,
   Image,
@@ -20,10 +20,44 @@ import {globalPath} from '../constants/globalPath';
 import Icon from '../components/Icon';
 import RightIcons from '../components/RightIcons';
 import App from '../screens/Streamer';
-import RobotController from './wifi';
+import WebSocketExample from './wifi';
 
 const Home = () => {
   const [sliderValue, setSliderValue] = useState(0);
+  const ws = useRef(null); // WebSocket reference
+  const [messageText, setMessageText] = useState(''); // State for input message
+  const [messages, setMessages] = useState([]); // State for received messages
+
+  useEffect(() => {
+      // Create WebSocket connection
+      ws.current = new WebSocket('ws://192.168.1.60:8000');
+
+      // WebSocket event handlers
+      ws.current.onopen = () => {
+          console.log('Connected to the server');
+          // Optionally send a message once connected
+          ws.current.send('Hello Server!');
+      };
+
+      ws.current.onmessage = (e) => {
+          console.log('Message from server:', e.data);
+          setMessages(prevMessages => [...prevMessages, e.data]); // Update messages state
+      };
+
+      ws.current.onerror = (e) => {
+          console.error('WebSocket error:', e.message);
+      };
+
+      ws.current.onclose = (e) => {
+          console.log('WebSocket closed:', e.code, e.reason);
+      };
+
+      // Clean up on component unmount
+      return () => {
+          ws.current.close();
+      };
+  }, []);
+
 
   const handleValueChange = (value) => {
     const scaledValue = Math.round(value * 100);
@@ -31,6 +65,26 @@ const Home = () => {
     setSliderValue(scaledValue);
   };
 
+  const onTouchEvent = async (event: { eventType: string; ratio: { x: number; y: number } }) => {
+    console.log('Custom handler', event.eventType, event.ratio.x, event.ratio.y);
+    if (ws.current.readyState === WebSocket.OPEN) {
+      const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`;
+      ws.current.send(dataToSend);
+    } else {
+        console.error('WebSocket is not open. Ready state: ', ws.current.readyState);
+    }
+    // if (connected) {
+    //     const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`; // Format data
+    //     try {
+    //         await sendData(dataToSend); // Send data via Bluetooth
+    //         console.log('Coordinates sent successfully:', dataToSend);
+    //     } catch (error) {
+    //         console.error('Failed to send coordinates:', error);
+    //     }
+    // } else {
+    //     console.log('Device is not connected');
+    // }
+};
 
 
   const [isFullScreen, setFullScreen] = useState(false);
@@ -80,14 +134,14 @@ const Home = () => {
 
         <View style={styles.joystickContainer}>
           <View style={{left: wp(-7)}}>
-            <CustomAxisPad />
+            <CustomAxisPad onTouchEvent={onTouchEvent}/>
           </View>
           <View style={{justifyContent: 'center', left: wp(-3)}}>
             <CustomSlider Value={sliderValue}OnValueChange={handleValueChange}/>
           </View>
           <View style={{right: wp(-2)}}>
-            {/* <CustomAxisPad /> */}
-            {/* <RobotController/> */}
+            {/* <CustomAxisPad onTouchEvent={onTouchEvent}/> */}
+            {/* <WebSocketExample/> */}
           </View>
         </View>
 
@@ -125,8 +179,8 @@ const Home = () => {
                 top: 0,
               },
             ]}>
-            <CustomAxisPad opacity={0.5} />
-            <CustomAxisPad opacity={0.5} />
+            <CustomAxisPad opacity={0.5} onTouchEvent={onTouchEvent}/>
+            <CustomAxisPad opacity={0.5} onTouchEvent={onTouchEvent}/>
           </View>
           <View
             style={{
@@ -135,34 +189,34 @@ const Home = () => {
               bottom: hp(10),
               zIndex:1
             }}>
-            {/* <RightIcons
+            <RightIcons
               source={globalPath.Rectangle}
               defaultColor={'#ebc5e6'}
               isPressed={iconStates.rectangle} // Pass the state
               onPress={() => handleIconPress('rectangle')}
-            /> */}
-            {/* <RightIcons
+            />
+            <RightIcons
               source={globalPath.Group}
               defaultColor={'#cdf2f2'}
               isPressed={iconStates.group}
               onPress={() => handleIconPress('group')}
-            /> */}
+            /> 
             <View style={{marginHorizontal: wp(3), justifyContent: 'center'}}>
               <CustomSlider Value={sliderValue} OnValueChange={handleValueChange}/>
             </View>
-            {/* <RightIcons
+            <RightIcons
               source={globalPath.Polygon}
               defaultColor={'#dff2c7'}
               isPressed={iconStates.polygon}
               onPress={() => handleIconPress('polygon')}
-            /> */}
+            />
 
-            {/* <RightIcons
+            <RightIcons
               source={globalPath.Circle}
               defaultColor={'#ebc5c5'}
               isPressed={iconStates.circle}
               onPress={() => handleIconPress('circle')}
-            /> */}
+            />
           </View>
         </ImageBackground>
       </Modal>

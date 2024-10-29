@@ -34,9 +34,7 @@ const CustomAxisPad = ({
           controlStyle={controlStyle || styles.controlStyle}
           ignoreTouchDownInPadArea={false}
           initialTouchType={'no-snap'}
-          onTouchEvent={event => {
-            console.log('event', event);
-          }}>
+          onTouchEvent={onTouchEvent}>
           <ImageBackground
             style={[
               styles.innerellipse,
