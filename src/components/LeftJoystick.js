@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {  TouchableOpacity} from 'react-native-gesture-handler'
+// import {  TouchableOpacity} from 'react-native-gesture-handler'
 import React, {useState, useRef} from 'react';
 import {globalPath} from '../constants/globalPath';
 import Icon from './Icon';
@@ -36,9 +36,9 @@ const LeftIcons = ({source, position}) => {
   };
 
   return (
-    <TouchableOpacity
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
+    <View
+      onTouchStart={handlePressIn}
+      onTouchEnd={handlePressOut}
     >
       <Icon
         margin={[
@@ -51,7 +51,7 @@ const LeftIcons = ({source, position}) => {
         source={source}
         tintColor={isPressed ? colors.black : undefined}
       />
-    </TouchableOpacity>
+    </View>
   );
 };
 

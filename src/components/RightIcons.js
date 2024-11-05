@@ -3,12 +3,12 @@ import React, {useState} from 'react';
 import {globalPath} from '../constants/globalPath';
 import {wp} from '../helpers/Responsiveness';
 import Icon from './Icon';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const RightIcons = ({source, position, defaultColor, isPressed, onPress}) => {
   return (
-    <TouchableOpacity
-      onPress={onPress}
+    <View
+      onTouchStart={onPress}
       style={({pressed}) => [pressed && styles.pressedStyle]}>
       <ImageBackground
         style={[
@@ -26,7 +26,7 @@ const RightIcons = ({source, position, defaultColor, isPressed, onPress}) => {
           tintColor={isPressed ? defaultColor : undefined} // Change to the specific color when pressed
         />
       </ImageBackground>
-    </TouchableOpacity>
+    </View>
   );
 };
 

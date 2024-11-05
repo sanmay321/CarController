@@ -9,7 +9,7 @@ import {
   ImageBackground,
   Pressable,
 } from 'react-native';
-import {  TouchableOpacity} from 'react-native-gesture-handler'
+// import {  TouchableOpacity} from 'react-native-gesture-handler'
 import {hp, wp} from '../helpers/Responsiveness';
 import ResponsiveText from '../components/RnText';
 import {colors} from '../constants/colorsPallet';
@@ -125,11 +125,11 @@ const Home = () => {
           {/* <Image source={globalPath.image1} style={styles.screenImage} /> */}
           <Streamer/>
           <View style={styles.iconStyle}>
-          <TouchableOpacity
-            onPress={() => setFullScreen(true)}
+          <View
+            onTouchStart={() => setFullScreen(true)}
             >
             <Icon size={wp(3)} source={globalPath.fullscreen} />
-          </TouchableOpacity>
+          </View>
           </View>
         </View>
 
@@ -170,10 +170,10 @@ const Home = () => {
           style={styles.backgroundImage}>
         <Streamer/>
         <View style={styles.iconStyle}>
-          <TouchableOpacity
-            onPress={() => setFullScreen(false)}>
+          <View
+            onTouchStart={() => setFullScreen(false)}>
             <Icon size={wp(3)} source={globalPath.fullscreen} />
-          </TouchableOpacity>
+          </View>
         </View>
           <View
             style={[
