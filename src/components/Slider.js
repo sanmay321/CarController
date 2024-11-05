@@ -51,7 +51,8 @@ console.log('value', Value)
             onValueChange={handleValueChange}
             minimumTrackTintColor="transparent"
             maximumTrackTintColor={colors.transparent}
-            thumbTintColor={colors.grey1}
+            // thumbImage={globalPath.Ellipse8}
+            thumbTintColor={colors.grey2dd}
             trackImage={globalPath.Ellipse4}
           />
         </View>

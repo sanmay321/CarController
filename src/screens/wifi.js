@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Text, View, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 
-const WebSocketExample  = ({ Value,OnValueChange,bottom }) => {
+const WebSocketExample = ({ Value, OnValueChange, bottom }) => {
     const ws = useRef(null); // WebSocket reference
     const [messageText, setMessageText] = useState(''); // State for input message
     const [messages, setMessages] = useState([]); // State for received messages
 
     useEffect(() => {
-        // Create WebSocket connection
-        ws.current = new WebSocket('ws://192.168.1.32:8000');
+        // Create WebSocket connection to the ESP32 server at /ws
+        ws.current = new WebSocket('ws://192.168.0.242:8008/ws');
 
         // WebSocket event handlers
         ws.current.onopen = () => {
             console.log('Connected to the server');
             // Optionally send a message once connected
-            ws.current.send('Hello Server!');
+            ws.current.send('Hello ESP32!');
         };
 
         ws.current.onmessage = (e) => {

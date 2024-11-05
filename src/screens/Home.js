@@ -4,11 +4,12 @@ import {
   View,
   Image,
   StyleSheet,
-  // TouchableOpacity,
+  TouchableOpacity,
   Modal,
+  StatusBar,
   ImageBackground,
-  Pressable,
 } from 'react-native';
+// import {  TouchableOpacity} from 'react-native-gesture-handler'
 // import {  TouchableOpacity} from 'react-native-gesture-handler'
 import {hp, wp} from '../helpers/Responsiveness';
 import ResponsiveText from '../components/RnText';
@@ -20,8 +21,9 @@ import CustomSlider from '../components/Slider';
 import {globalPath} from '../constants/globalPath';
 import Icon from '../components/Icon';
 import RightIcons from '../components/RightIcons';
-import WebSocketExample from './wifi';
-import Streamer from '../screens/Streamer';
+import HLSPlayer from '../screens/Streamer1';
+import WebSocketExample from '../screens/wifi';
+// import WebSocketExample from './wifi';
 
 const Home = () => {
   const [sliderValue, setSliderValue] = useState(0);
@@ -29,15 +31,16 @@ const Home = () => {
   const [messageText, setMessageText] = useState(''); // State for input message
   const [messages, setMessages] = useState([]); // State for received messages
 
+
   useEffect(() => {
-      // Create WebSocket connection
-      ws.current = new WebSocket('ws://192.168.1.60:8000');
+      // Create WebSocket connection to the ESP32 server at /ws
+      ws.current = new WebSocket('ws://192.168.0.242:8008/ws');
 
       // WebSocket event handlers
       ws.current.onopen = () => {
           console.log('Connected to the server');
           // Optionally send a message once connected
-          ws.current.send('Hello Server!');
+          ws.current.send('Hello ESP32!');
       };
 
       ws.current.onmessage = (e) => {
@@ -61,9 +64,9 @@ const Home = () => {
 
 
   const handleValueChange = (value) => {
-    const scaledValue = Math.round(value * 100);
-    console.log('Slider Value:', scaledValue);
-    setSliderValue(scaledValue);
+    // const scaledValue = Math.round(value * 100);
+    // console.log('Slider Value:', scaledValue);
+    setSliderValue(value);
   };
 
   const onTouchEvent = async (event: { eventType: string; ratio: { x: number; y: number } }) => {
@@ -72,19 +75,19 @@ const Home = () => {
       const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`;
       ws.current.send(dataToSend);
     } else {
-        console.error('WebSocket is not open. Ready state: ', ws.current.readyState);
+        console.log('WebSocket is not open. Ready state: ', ws.current.readyState);
     }
-    // if (connected) {
-    //     const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`; // Format data
-    //     try {
-    //         await sendData(dataToSend); // Send data via Bluetooth
-    //         console.log('Coordinates sent successfully:', dataToSend);
-    //     } catch (error) {
-    //         console.error('Failed to send coordinates:', error);
-    //     }
-    // } else {
-    //     console.log('Device is not connected');
-    // }
+    if (connected) {
+        const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`; // Format data
+        if (ws.current.readyState === WebSocket.OPEN) {
+          ws.current.send(dataToSend);
+          setMessageText(''); // Clear input after sending
+      } else {
+          console.error('WebSocket is not open. Ready state: ', ws.current.readyState);
+      }
+    } else {
+        console.log('Device is not connected');
+    }
 };
 
 
@@ -123,7 +126,7 @@ const Home = () => {
         }}>
         <View style={styles.screenContainer}>
           {/* <Image source={globalPath.image1} style={styles.screenImage} /> */}
-          <Streamer/>
+          <HLSPlayer/>
           <View style={styles.iconStyle}>
           <View
             onTouchStart={() => setFullScreen(true)}
@@ -139,7 +142,7 @@ const Home = () => {
           <View style={{left: wp(-7)}}>
             <CustomAxisPad onTouchEvent={onTouchEvent}/>
           </View>
-          <View style={{justifyContent: 'center', left: wp(-3)}}>
+          <View style={{justifyContent: 'center', top:wp(7),left: wp(-3)}}>
             <CustomSlider Value={sliderValue}OnValueChange={handleValueChange}/>
           </View>
           <View style={{right: wp(-2)}}>
@@ -168,11 +171,11 @@ const Home = () => {
         <View
           // source={globalPath.image1} // Replace with your image URL or import a local image
           style={styles.backgroundImage}>
-        <Streamer/>
+        <HLSPlayer/>
         <View style={styles.iconStyle}>
           <View
             onTouchStart={() => setFullScreen(false)}>
-            <Icon size={wp(3)} source={globalPath.fullscreen} />
+            <Icon size={wp(3)} source={globalPath.shortscreen} />
           </View>
         </View>
           <View
@@ -264,6 +267,7 @@ const styles = StyleSheet.create({
   },
 
   screenContainer: {
+    flex:1,
     width: wp(35),
     height: hp(45),
     justifyContent: 'center',

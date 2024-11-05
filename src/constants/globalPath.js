@@ -26,7 +26,8 @@ const Ellipse4 = require('../assets/joystick/Ellipse4.png');
 const Ellipse8 = require('../assets/joystick/Ellipse8.png');
 
 const logo = require('../assets/images/logo.png');
-const fullscreen = require('../assets/images/fullscreen.jpeg');
+const fullscreen = require('../assets/images/fullscreen.png');
+const shortscreen = require('../assets/images/shortscreen.png');
 const image1 = require('../assets/images/image1.png');
 
 
@@ -56,5 +57,6 @@ export const globalPath = {
   Ellipse8,
   logo,
   fullscreen,
+  shortscreen,
   image1
 };

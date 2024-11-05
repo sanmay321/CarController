@@ -1,24 +1,24 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import Home from './src/screens/Home';
-import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Streamer from './src/screens/Streamer';
+// import Streamer from './src/screens/Streamer';
+import 'react-native-udp';
+import { Buffer } from 'buffer';
+
+global.Buffer = Buffer;
+
+
+global.Buffer = Buffer; // Set global Buffer
+
 const App = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-        <Home/>
+      <StatusBar hidden={true} />
+      <Home/>
       {/* <Streamer/> */}
     </GestureHandlerRootView>
   );
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
