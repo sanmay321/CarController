@@ -3,7 +3,7 @@
 
 const Subtract = require('../assets/rightPanel/Subtract.png');
 
-// RightPanel 
+// RightPanel
 
 const Rectangle = require('../assets/rightPanel/Rectangle22.png');
 const Polygon = require('../assets/rightPanel/Polygon6.png');
@@ -30,15 +30,20 @@ const fullscreen = require('../assets/images/fullscreen.png');
 const shortscreen = require('../assets/images/shortscreen.png');
 const image1 = require('../assets/images/image1.png');
 
+// settings
 
-
-
-
-
+const back = require('../assets/WifiSettings/back.png');
+const Settings = require('../assets/WifiSettings/Settings.png');
+const Refresh = require('../assets/WifiSettings/Refresh.png');
+const verticalLine = require('../assets/WifiSettings/verticalLine.png');
+const toggleOn = require('../assets/WifiSettings/toggleOn.png');
+const toggleOff = require('../assets/WifiSettings/toggleOff.png');
 
 
 
 export const globalPath = {
+  verticalLine,
+  Refresh,
   Subtract,
   Rectangle,
   Polygon,
@@ -58,5 +63,9 @@ export const globalPath = {
   logo,
   fullscreen,
   shortscreen,
-  image1
+  image1,
+  Settings,
+  back,
+  toggleOn,
+  toggleOff
 };

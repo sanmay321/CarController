@@ -1,14 +1,11 @@
-import {
-  ImageBackground,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {ImageBackground, StyleSheet, View} from 'react-native';
 // import {  TouchableOpacity} from 'react-native-gesture-handler'
 import React, {useState, useRef} from 'react';
 import {globalPath} from '../constants/globalPath';
 import Icon from './Icon';
 import {colors} from '../constants/colorsPallet';
 import {wp} from '../helpers/Responsiveness';
+import Multitouch from './Multitouch';
 
 const LeftIcons = ({source, position}) => {
   const [isPressed, setIsPressed] = useState(false);
@@ -36,10 +33,7 @@ const LeftIcons = ({source, position}) => {
   };
 
   return (
-    <View
-      onTouchStart={handlePressIn}
-      onTouchEnd={handlePressOut}
-    >
+    <Multitouch onTouchStart={handlePressIn} onTouchEnd={handlePressOut}>
       <Icon
         margin={[
           position === 'bottom' ? -20 : 0,
@@ -51,7 +45,7 @@ const LeftIcons = ({source, position}) => {
         source={source}
         tintColor={isPressed ? colors.black : undefined}
       />
-    </View>
+    </Multitouch>
   );
 };
 

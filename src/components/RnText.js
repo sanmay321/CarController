@@ -68,7 +68,7 @@ const ResponsiveText = ({
 const styles = {
   text: {
     fontFamily:'',
-    fontSize: wp(2),
+    fontSize: wp(1.5),
     // lineHeight: 16,
 
   },
