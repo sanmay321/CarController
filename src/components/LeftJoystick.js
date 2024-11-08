@@ -6,12 +6,21 @@ import {colors} from '../constants/colorsPallet';
 import {wp} from '../helpers/Responsiveness';
 import Multitouch from './Multitouch';
 
-const LeftIcons = ({source, position}) => {
+const LeftIcons = ({source, position,ws}) => {
   const [isPressed, setIsPressed] = useState(false);
   const intervalRef = useRef(null);
 
   const handlePressIn = () => {
     console.log('Started Pressing:', position);
+    // const sendMessage = (message) => {
+      // Check if the WebSocket is open
+      if (ws && ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.send(position);
+        console.log('Message sent:', position);
+      } else {
+        console.log('WebSocket is not open');
+      }
+    // };
     setIsPressed(true);
 
     intervalRef.current = setInterval(() => {
@@ -59,22 +68,24 @@ const LeftIcons = ({source, position}) => {
 };
 
 
-const LeftJoystick = () => {
+const LeftJoystick = ({ws}) => {
+
+
   return (
     <ImageBackground style={styles.joystick} source={globalPath.Subtract}>
       <Icon margin={[0, 0, 0, 0]} size={wp(2)} source={globalPath.Polygon2} />
-      <LeftIcons source={globalPath.Rectangle19} position="top" />
+      <LeftIcons source={globalPath.Rectangle19} position="top" ws={ws} />
       <View style={styles.row}>
         <View style={styles.iconGroup}>
           <Icon size={wp(2)} source={globalPath.Polygon3} />
-          <LeftIcons source={globalPath.Rectangle17} position="left" />
+          <LeftIcons source={globalPath.Rectangle17} position="left" ws={ws}/>
         </View>
         <View style={styles.iconGroup}>
-          <LeftIcons source={globalPath.Rectangle18} position="right" />
+          <LeftIcons source={globalPath.Rectangle18} position="right" ws={ws}/>
           <Icon size={wp(2)} source={globalPath.Polygon1} />
         </View>
       </View>
-      <LeftIcons source={globalPath.Rectangle20} position="bottom" />
+      <LeftIcons source={globalPath.Rectangle20} position="bottom" ws={ws}/>
       <Icon size={wp(2)} source={globalPath.Polygon4} />
     </ImageBackground>
   );

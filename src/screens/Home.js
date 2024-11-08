@@ -25,10 +25,12 @@ const Home = () => {
   const [messages, setMessages] = useState([]); // State for received messages
   const [wifiSettingsVisible, setWifiSettingsVisible] = useState(false);
   const [connected, setConnected] = useState(false); // Track WebSocket connection state
+  const [recentPosition, setRecentPosition] = useState( { x: 0, y: 0 }); // Track WebSocket connection state
+  // let recentPosition =; // Store the recent joystick position
 
   useEffect(() => {
     // Create WebSocket connection to the ESP32 server at /ws
-    ws.current = new WebSocket('ws://192.168.0.148:8008/ws');
+    ws.current = new WebSocket('ws://192.168.8.175:8008/ws');
 
     // WebSocket event handlers
     ws.current.onopen = () => {
@@ -59,23 +61,27 @@ const Home = () => {
   }, []);
 
   // Send x0:y0 continuously if WebSocket is not connected or no touch event is triggered
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (connected && ws.current && ws.current.readyState === WebSocket.OPEN) {
-  //       ws.current.send('x0:y0');
-  //       console.log(1)
-  //     }
-  //   }, 150); // Send every 1 second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (connected && ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.send(`x${recentPosition.x}:y${recentPosition.y}`);
+        console.log(`x${recentPosition.x}:y${recentPosition.y}`)
+      }
+    }, 200); // Send every 1 second
 
-  //   // Cleanup the interval when component unmounts or WebSocket is connected
-  //   return () => clearInterval(interval);
-  // }, [connected]);
+    // Cleanup the interval when component unmounts or WebSocket is connected
+    return () => clearInterval(interval);
+  }, [connected]);
 
   const handleValueChange = (value) => {
     setSliderValue(value);
   };
 
   const onTouchEvent = async (event) => {
+    setRecentPosition({
+      x: Math.round(event.ratio.x * 100),
+      y: Math.round(event.ratio.y * 100),
+    })
     // // Ensure x and y values are between 0 and 1. Adjust if necessary.
     // const clampedX = Math.max(0, Math.min(1, event.ratio.x));
     // const clampedY = Math.max(0, Math.min(1, event.ratio.y));
@@ -83,11 +89,11 @@ const Home = () => {
     // // Scale the clamped values from 0–1 to -255 to +255.
     // const scaledX = Math.round(clampedX * 510 - 255);
     // const scaledY = Math.round(clampedY * 510 - 255);
-  
-    console.log(`x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`);
+    const dataToSend = `x${recentPosition.x}:y${recentPosition.y}`;
+    console.log(dataToSend);
   
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      const dataToSend = `x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`;
+      // const dataToSend = `x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`;
       ws.current.send(dataToSend);
     } else {
       console.log(
@@ -126,7 +132,7 @@ const Home = () => {
           </View>
         </Multitouch>
         {/* Left Pannel */}
-        <LeftJoystick />
+        <LeftJoystick ws={ws}/>
         <View />
       </View>
       <View
