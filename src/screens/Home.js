@@ -24,13 +24,16 @@ const Home = () => {
   const [messageText, setMessageText] = useState(''); // State for input message
   const [messages, setMessages] = useState([]); // State for received messages
   const [wifiSettingsVisible, setWifiSettingsVisible] = useState(false);
+  const [connected, setConnected] = useState(false); // Track WebSocket connection state
+
   useEffect(() => {
     // Create WebSocket connection to the ESP32 server at /ws
-    ws.current = new WebSocket('ws://192.168.0.242:8008/ws');
+    ws.current = new WebSocket('ws://192.168.0.148:8008/ws');
 
     // WebSocket event handlers
     ws.current.onopen = () => {
       console.log('Connected to the server');
+      setConnected(true); // Mark the connection as successful
       // Optionally send a message once connected
       ws.current.send('Hello ESP32!');
     };
@@ -41,11 +44,12 @@ const Home = () => {
     };
 
     ws.current.onerror = e => {
-      console.error('WebSocket error:', e.message);
+      console.log('WebSocket error:', e.message);
     };
 
     ws.current.onclose = e => {
       console.log('WebSocket closed:', e.code, e.reason);
+      setConnected(false); // Reset connection state when WebSocket closes
     };
 
     // Clean up on component unmount
@@ -54,46 +58,45 @@ const Home = () => {
     };
   }, []);
 
-  const handleValueChange = value => {
-    // const scaledValue = Math.round(value * 100);
-    // console.log('Slider Value:', scaledValue);
+  // Send x0:y0 continuously if WebSocket is not connected or no touch event is triggered
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (connected && ws.current && ws.current.readyState === WebSocket.OPEN) {
+  //       ws.current.send('x0:y0');
+  //       console.log(1)
+  //     }
+  //   }, 150); // Send every 1 second
+
+  //   // Cleanup the interval when component unmounts or WebSocket is connected
+  //   return () => clearInterval(interval);
+  // }, [connected]);
+
+  const handleValueChange = (value) => {
     setSliderValue(value);
   };
 
-  const onTouchEvent = async (event: {
-    eventType: string,
-    ratio: {x: number, y: number},
-  }) => {
-    console.log(
-      'Custom handler',
-      event.eventType,
-      event.ratio.x,
-      event.ratio.y,
-    );
-    if (ws.current.readyState === WebSocket.OPEN) {
-      const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`;
+  const onTouchEvent = async (event) => {
+    // // Ensure x and y values are between 0 and 1. Adjust if necessary.
+    // const clampedX = Math.max(0, Math.min(1, event.ratio.x));
+    // const clampedY = Math.max(0, Math.min(1, event.ratio.y));
+  
+    // // Scale the clamped values from 0–1 to -255 to +255.
+    // const scaledX = Math.round(clampedX * 510 - 255);
+    // const scaledY = Math.round(clampedY * 510 - 255);
+  
+    console.log(`x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`);
+  
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      const dataToSend = `x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`;
       ws.current.send(dataToSend);
     } else {
       console.log(
         'WebSocket is not open. Ready state: ',
-        ws.current.readyState,
+        ws.current?.readyState,
       );
     }
-    if (connected) {
-      const dataToSend = `x:${event.ratio.x},y:${event.ratio.y}`; // Format data
-      if (ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(dataToSend);
-        setMessageText(''); // Clear input after sending
-      } else {
-        console.error(
-          'WebSocket is not open. Ready state: ',
-          ws.current.readyState,
-        );
-      }
-    } else {
-      console.log('Device is not connected');
-    }
   };
+  
 
   const [isFullScreen, setFullScreen] = useState(false);
   const [isPressed, setIsPressed] = useState(false);

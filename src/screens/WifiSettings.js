@@ -57,6 +57,13 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
             // Port is open; add IP to list of reachable devices
             console.log(`Open port found on IP: ${ip}`);
             reachableDevices.push(ip);
+            if(ip != ipPrefix){
+              newDevice = { devicename: 'Wifi ', address: ip };
+
+              // Adding the new device to the state
+              setAvailableDevices(newDevice);
+
+            }
             client.destroy(); // Close immediately
             resolve(true);
           },
@@ -79,7 +86,9 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
     const scanPromises = [];
     for (let i = 1; i <= 254; i++) {
       const ip = `${ipPrefix}.${i}`;
+      console.log(ip)
       scanPromises.push(checkPortOpen(ip));
+      console.log(scanPromises)
     }
 
     await Promise.all(scanPromises);
@@ -199,7 +208,7 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
               <>
                 <View style={styles.row}>
                   <View>
-                    <ResponsiveText color={colors.white1}>
+                    <ResponsiveText color={colors.white1}>s
                       {item.devicename}
                     </ResponsiveText>
                     <ResponsiveText size={1.3} color={colors.grey1}>

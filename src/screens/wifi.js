@@ -88,3 +88,33 @@ const styles = StyleSheet.create({
 });
 
 export default WebSocketExample;
+
+// // networkScanner.js
+// import { NetworkInfo } from 'react-native-network-info';
+// import TcpSocket from 'react-native-tcp-socket';
+
+// export const scanLANForOpenPort = async (port) => {
+//     try {
+//         const deviceIp = await NetworkInfo.getIPV4Address();
+//         const ipPrefix = deviceIp.split('.').slice(0, 3).join('.');
+//         const reachableDevices = [];
+        
+//         const batchSize = 20; // Adjust batch size to avoid overwhelming the network
+//         const ips = Array.from({ length: 254 }, (_, i) => `${ipPrefix}.${i + 1}`);
+
+//         for (let i = 0; i < ips.length; i += batchSize) {
+//             const batch = ips.slice(i, i + batchSize).map(ip => checkPortOpen(ip));
+//             const results = await Promise.allSettled(batch);
+//             results.forEach((result, index) => {
+//                 if (result.status === 'fulfilled' && result.value) {
+//                     reachableDevices.push(ips[i + index]);
+//                 }
+//             });
+//         }
+        
+//         return reachableDevices;
+//     } catch (error) {
+//         console.error('Error scanning LAN for open port:', error);
+//         return [];
+//     }
+// };

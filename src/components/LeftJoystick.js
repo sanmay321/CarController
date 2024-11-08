@@ -1,6 +1,5 @@
 import {ImageBackground, StyleSheet, View} from 'react-native';
-// import {  TouchableOpacity} from 'react-native-gesture-handler'
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {globalPath} from '../constants/globalPath';
 import Icon from './Icon';
 import {colors} from '../constants/colorsPallet';
@@ -9,13 +8,12 @@ import Multitouch from './Multitouch';
 
 const LeftIcons = ({source, position}) => {
   const [isPressed, setIsPressed] = useState(false);
-  const intervalRef = useRef(null); // Use ref to store interval
+  const intervalRef = useRef(null);
 
   const handlePressIn = () => {
     console.log('Started Pressing:', position);
     setIsPressed(true);
 
-    // Start logging continuously every 500ms
     intervalRef.current = setInterval(() => {
       console.log('Holding:', position);
     }, 500);
@@ -25,15 +23,26 @@ const LeftIcons = ({source, position}) => {
     console.log('Released:', position);
     setIsPressed(false);
 
-    // Clear interval to stop logging
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <Multitouch onTouchStart={handlePressIn} onTouchEnd={handlePressOut}>
+    <Multitouch 
+      onTouchStart={handlePressIn} 
+      onTouchEnd={handlePressOut} 
+      onTouchCancel={handlePressOut} // Fallback for unexpected cancel
+    >
       <Icon
         margin={[
           position === 'bottom' ? -20 : 0,
@@ -48,6 +57,7 @@ const LeftIcons = ({source, position}) => {
     </Multitouch>
   );
 };
+
 
 const LeftJoystick = () => {
   return (
