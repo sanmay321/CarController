@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import ResponsiveText from '../components/RnText';
@@ -20,23 +21,33 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
   const [enableCar, setEnableCar] = useState(true);
   const [enableDrone, setEnableDrone] = useState(false);
   const [forgotPopup, setForgotPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [render, setRender] = useState(false);
   const [pairedDevices, setpairedDevices] = useState([
-    // {devicename: 'Wifi Car', address: '00:1b:63:84:45:e6 '},
+    // {deviceName: 'Wifi Car', address: '00:1b:63:84:45:e6 '},
   ]);
   const [availableDevices, setAvailableDevices] = useState([
-    {devicename: 'Wifi Car', address: '00:1b:63:84:45:e6 '},
-    {devicename: 'Wifi Drone', address: '00:1b:63:84:45:e6 '},
-    {devicename: 'Wifi Spider', address: '00:1b:63:84:45:e6 '},
+    // {deviceName: 'Wifi Car', address: '00:1b:63:84:45:e6 '},
+    // {deviceName: 'Wifi Drone', address: '00:1b:63:84:45:e6 '},
+    // {deviceName: 'Wifi Spider', address: '00:1b:63:84:45:e6 '},
   ]);
+  useEffect(() => {
+    setAvailableDevices(availableDevices);
+  }, [render]);
 
   useEffect(() => {
-    // Usage example
+    // Example usage
+    setLoading(true);
     scanLANForOpenPort(8008)
       .then(devices => {
         console.log('Devices with server listening on port 8008:', devices);
-        // setAvailableDevices(devices);
+        setAvailableDevices(devices);
+        setLoading(false);
       })
-      .catch(err => console.log('err', err));
+      .catch(err => {
+        setLoading(false);
+        console.log('Error scanning LAN:', err);
+      });
   }, []);
 
   const scanLANForOpenPort = async port => {
@@ -46,28 +57,27 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
 
     // Determine the IP range based on the device's IP
     const ipPrefix = deviceIp.split('.').slice(0, 3).join('.');
-    console.log('ipPrefix', ipPrefix);
+    console.log('IP prefix:', ipPrefix);
+
     const reachableDevices = [];
 
+    // Check if a port is open on a given IP
     const checkPortOpen = ip => {
       return new Promise(resolve => {
         const client = TcpSocket.createConnection(
           {host: ip, port: port, timeout: 500},
           () => {
             // Port is open; add IP to list of reachable devices
-            console.log(`Open port found on IP: ${ip}`);
-            reachableDevices.push(ip);
-            if(ip != ipPrefix){
-              newDevice = { devicename: 'Wifi ', address: ip };
-
-              // Adding the new device to the state
-              setAvailableDevices(newDevice);
-
-            }
+            const newDevice = {deviceName: `Device at ${ip}`, address: ip};
+            reachableDevices.push(newDevice);
+            setAvailableDevices(reachableDevices);
+            setRender(!render);
+            console.log('New device found:', newDevice);
             client.destroy(); // Close immediately
             resolve(true);
           },
         );
+
         client.on('error', () => {
           // Port is not open or connection failed
           client.destroy();
@@ -86,21 +96,23 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
     const scanPromises = [];
     for (let i = 1; i <= 254; i++) {
       const ip = `${ipPrefix}.${i}`;
-      console.log(ip)
+      console.log('ip====>', ip);
+
       scanPromises.push(checkPortOpen(ip));
-      console.log(scanPromises)
     }
 
+    // Await all scans and return the list of reachable devices
     await Promise.all(scanPromises);
     console.log('Devices with open port:', reachableDevices);
     return reachableDevices;
   };
+
   useEffect(() => {
     console.log('Paired devices updated:', pairedDevices);
   }, [pairedDevices.length]);
 
-  const pairDevice = (item) => {
-    setpairedDevices((prevDevices) => {
+  const pairDevice = item => {
+    setpairedDevices(prevDevices => {
       const updatedDevices = [...prevDevices, item];
       console.log('Updated paired devices:', updatedDevices);
       return updatedDevices;
@@ -120,6 +132,7 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
       onRequestClose={onRequestClose}>
       <GestureHandlerRootView style={styles.modalBackground}>
         <View style={styles.modalContainer}>
+          {/* <ActivityIndicator animating={loading} size={'large'} /> */}
           <ScrollView>
             <View style={styles.row}>
               <Multitouch onPress={onRequestClose}>
@@ -136,7 +149,7 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
                 <View style={[styles.row, {paddingVertical: 0}]}>
                   <View>
                     <ResponsiveText color={colors.white1}>
-                      {device.devicename}
+                      {device.deviceName}
                     </ResponsiveText>
                     <ResponsiveText size={1.3} color={colors.grey1}>
                       {device.address}
@@ -208,14 +221,14 @@ const WifiSettings = ({isVisible, onRequestClose}) => {
               <>
                 <View style={styles.row}>
                   <View>
-                    <ResponsiveText color={colors.white1}>s
-                      {item.devicename}
+                    <ResponsiveText color={colors.white1}>
+                      {item.deviceName}
                     </ResponsiveText>
                     <ResponsiveText size={1.3} color={colors.grey1}>
                       {item.address}
                     </ResponsiveText>
                   </View>
-                  <TouchableOpacity onPress={()=>pairDevice(item)}>
+                  <TouchableOpacity onPress={() => pairDevice(item)}>
                     <ResponsiveText
                       size={1.5}
                       color={colors.white1}
