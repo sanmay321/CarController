@@ -4,7 +4,7 @@ import {globalPath} from '../constants/globalPath';
 import Icon from './Icon';
 import {colors} from '../constants/colorsPallet';
 import {wp} from '../helpers/Responsiveness';
-import Multitouch from './Multitouch';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const LeftIcons = ({source, position,ws}) => {
   const [isPressed, setIsPressed] = useState(false);
@@ -47,26 +47,20 @@ const LeftIcons = ({source, position,ws}) => {
   }, []);
 
   return (
-    <Multitouch 
-      onTouchStart={handlePressIn} 
-      onTouchEnd={handlePressOut} 
-      onTouchCancel={handlePressOut} // Fallback for unexpected cancel
-    >
+    <TouchableWithoutFeedback onPressIn={handlePressIn} onPressOut={handlePressOut}>
       <Icon
-        margin={[
-          position === 'bottom' ? -20 : 0,
-          0,
-          position === 'top' ? -20 : 0,
-          0,
+        style={[
+          styles.icon,
+          position === 'top' && { marginBottom: -20 },
+          position === 'bottom' && { marginTop: -20 },
         ]}
         size={wp(6)}
         source={source}
         tintColor={isPressed ? colors.black : undefined}
       />
-    </Multitouch>
+    </TouchableWithoutFeedback>
   );
 };
-
 
 const LeftJoystick = ({ws}) => {
 
@@ -108,5 +102,9 @@ const styles = StyleSheet.create({
   iconGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

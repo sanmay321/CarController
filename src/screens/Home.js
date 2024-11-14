@@ -19,13 +19,14 @@ import WifiSettings from './WifiSettings';
 // import WebSocketExample from './wifi';
 
 const Home = () => {
+  const intervalRef = useRef(null);
   const [sliderValue, setSliderValue] = useState(0);
   const ws = useRef(null); // WebSocket reference
   const [messageText, setMessageText] = useState(''); // State for input message
   const [messages, setMessages] = useState([]); // State for received messages
   const [wifiSettingsVisible, setWifiSettingsVisible] = useState(false);
   const [connected, setConnected] = useState(false); // Track WebSocket connection state
-  const [recentPosition, setRecentPosition] = useState( { x: 0, y: 0 }); // Track WebSocket connection state
+  const [recentPosition, setRecentPosition] = useState({x: 0, y: 0}); // Track WebSocket connection state
   // let recentPosition =; // Store the recent joystick position
 
   useEffect(() => {
@@ -61,48 +62,68 @@ const Home = () => {
   }, []);
 
   // Send x0:y0 continuously if WebSocket is not connected or no touch event is triggered
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (connected && ws.current && ws.current.readyState === WebSocket.OPEN) {
-        ws.current.send(`x${recentPosition.x}:y${recentPosition.y}`);
-        console.log(`x${recentPosition.x}:y${recentPosition.y}`)
-      }
-    }, 200); // Send every 1 second
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (connected && ws.current && ws.current.readyState === WebSocket.OPEN) {
+  //       ws.current.send(`x${recentPosition.x}:y${recentPosition.y}`);
+  //       console.log(`x${recentPosition.x}:y${recentPosition.y}`)
+  //     }
+  //   }, 200); // Send every 1 second
 
-    // Cleanup the interval when component unmounts or WebSocket is connected
-    return () => clearInterval(interval);
-  }, [connected]);
+  //   // Cleanup the interval when component unmounts or WebSocket is connected
+  //   return () => clearInterval(interval);
+  // }, [connected]);
 
-  const handleValueChange = (value) => {
+  const handleValueChange = value => {
     setSliderValue(value);
   };
 
-  const onTouchEvent = async (event) => {
-    setRecentPosition({
-      x: Math.round(event.ratio.x * 100),
-      y: Math.round(event.ratio.y * 100),
-    })
-    // // Ensure x and y values are between 0 and 1. Adjust if necessary.
-    // const clampedX = Math.max(0, Math.min(1, event.ratio.x));
-    // const clampedY = Math.max(0, Math.min(1, event.ratio.y));
-  
-    // // Scale the clamped values from 0–1 to -255 to +255.
-    // const scaledX = Math.round(clampedX * 510 - 255);
-    // const scaledY = Math.round(clampedY * 510 - 255);
-    const dataToSend = `x${recentPosition.x}:y${recentPosition.y}`;
-    console.log(dataToSend);
-  
+  const sendData = (x, y) => {
+    const dataToSend = `x${x}:y${y}`;
+    console.log('dataToSend=====>', dataToSend);
+
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       // const dataToSend = `x${Math.round(event.ratio.y*100)}y${Math.round(event.ratio.y*100)}`;
       ws.current.send(dataToSend);
     } else {
-      console.log(
-        'WebSocket is not open. Ready state: ',
-        ws.current?.readyState,
-      );
+      // console.log(
+      //   'WebSocket is not open. Ready state: ',
+      //   ws.current?.readyState,
+      // );
     }
   };
-  
+  const recentPositionRef = useRef({ x: 0, y: 0 }); // To store the latest position values
+
+  const onTouchEvent = async (event) => {
+    if (event.eventType === 'start') {
+      // Store the initial position values when touch starts
+      recentPositionRef.current = {
+        x: Math.round(event.ratio.x * 100),
+        y: Math.round(event.ratio.y * 100),
+      };
+    } else if (event.eventType === 'pan') {
+      // Update the position values continuously during pan
+      recentPositionRef.current = {
+        x: Math.round(event.ratio.x * 100),
+        y: Math.round(event.ratio.y * 100),
+      };
+
+      // Start continuous sending on "pan" if not already started
+      if (!intervalRef.current) {
+        intervalRef.current = setInterval(() => {
+          // Use the latest values directly from the ref
+          const { x, y } = recentPositionRef.current;
+          sendData(x, y);
+        }, 100); // Adjust the interval time as needed
+      }
+    } else if (event.eventType === 'end') {
+      // Stop the continuous sending when touch ends
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  };
 
   const [isFullScreen, setFullScreen] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
@@ -132,7 +153,7 @@ const Home = () => {
           </View>
         </Multitouch>
         {/* Left Pannel */}
-        <LeftJoystick ws={ws}/>
+        <LeftJoystick ws={ws} />
         <View />
       </View>
       <View
