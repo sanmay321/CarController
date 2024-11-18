@@ -29,7 +29,7 @@ console.log('value', Value)
             colors={['#befda2', '#fbeba1', '#f19c9a']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={[styles.gradientTrack, { width: `${sliderValue * 100}%` }]}
+            style={[styles.gradientTrack, { width: `${sliderValue * 90}%` }]}
           />
 
           {/* Black right side of the track */}
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   gradientTrack: {
     position: 'absolute',
-    left: 0,
+    left: 10,
     height: 10,
     borderRadius: 5,
   },
