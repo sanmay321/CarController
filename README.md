@@ -1,5 +1,7 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+This app can control robots, cars, and more. The connection is basically in with Raspberry Pie my app is sending data through a web socket to the car(that.. what to do) and the car/robot is sending video footage through webrtc
+
 
 ## Screenshots
 ![ss](src/assets/images/1.png)
