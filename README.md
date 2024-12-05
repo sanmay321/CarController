@@ -3,6 +3,8 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 ## Screenshots
 ![ss](src/assets/images/1.png)
+![ss](src/assets/images/2.png)
+![ss](src/assets/images/3.png)
 # Getting Started
 
 >**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
